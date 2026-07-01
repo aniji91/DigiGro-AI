@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS project_views (
 );
 `;
 
-async function init() {
+export async function runInit() {
   const connectionConfig = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
@@ -177,4 +177,9 @@ async function init() {
   }
 }
 
-init();
+import { fileURLToPath } from 'url';
+
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  runInit();
+}

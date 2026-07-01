@@ -11,6 +11,7 @@ import { isVercelConfigured } from './services/vercel.js';
 import * as authHandlers from './routes/auth.js';
 import * as projectHandlers from './routes/projects.js';
 import * as shareHandlers from './routes/share.js';
+import { runInit } from './config/initDb.js';
 
 dotenv.config();
 
@@ -94,13 +95,23 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`
+async function start() {
+  try {
+    await runInit();
+  } catch (err) {
+    console.error('Database init warning:', err.message);
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`
   ╔══════════════════════════════════════╗
   ║         DIGIGRO AI Backend           ║
-  ║     http://localhost:${PORT}            ║
+  ║     port ${PORT}                         ║
   ║  AI Mode: ${getAiModeLabel()}             ║
   ║  Frontend: ${hasFrontendBuild ? 'served' : 'not built'}              ║
   ╚══════════════════════════════════════╝
   `);
-});
+  });
+}
+
+start();
