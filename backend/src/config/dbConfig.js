@@ -17,17 +17,18 @@ export function getDbName() {
 }
 
 export function getDbPassword() {
+  if (process.env.DB_PASSWORD_B64) {
+    return Buffer.from(process.env.DB_PASSWORD_B64, 'base64').toString('utf8');
+  }
   return process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD || undefined;
 }
 
-function useSocketConnection(host) {
-  if (process.env.DB_SOCKET) return true;
-  // Hostinger grants DB users as user@localhost (socket), not user@127.0.0.1 (TCP)
-  return host === 'localhost' && process.platform !== 'win32';
+export function getDatabaseUrl() {
+  return process.env.DATABASE_URL || process.env.MYSQL_URL || null;
 }
 
+/** Hostinger docs: host localhost + port 3306. Optional DB_SOCKET for socket-only setups. */
 export function getDbConnectionConfig(overrides = {}) {
-  const host = getDbHost();
   const config = {
     user: getDbUser(),
     database: getDbName(),
@@ -36,20 +37,46 @@ export function getDbConnectionConfig(overrides = {}) {
   const password = getDbPassword();
   if (password) config.password = password;
 
-  if (useSocketConnection(host)) {
-    config.socketPath = process.env.DB_SOCKET || '/var/lib/mysql/mysql.sock';
+  const socketPath = process.env.DB_SOCKET;
+  if (socketPath) {
+    config.socketPath = socketPath;
     return config;
   }
 
-  config.host = host;
+  config.host = getDbHost();
   config.port = getDbPort();
   return config;
 }
 
 export function getDbConnectionMode() {
-  const host = getDbHost();
-  if (useSocketConnection(host)) {
-    return `socket:${process.env.DB_SOCKET || '/var/lib/mysql/mysql.sock'}`;
+  if (getDatabaseUrl()) return 'url:DATABASE_URL';
+  if (process.env.DB_SOCKET) return `socket:${process.env.DB_SOCKET}`;
+  return `tcp:${getDbHost()}:${getDbPort()}`;
+}
+
+export function getDbEnvDiagnostics() {
+  const password = getDbPassword();
+  return {
+    dbMode: getDbConnectionMode(),
+    dbUser: getDbUser(),
+    dbName: getDbName(),
+    dbHost: getDbHost(),
+    dbPasswordSet: Boolean(password),
+    dbPasswordLength: password?.length ?? 0,
+    usingDatabaseUrl: Boolean(getDatabaseUrl()),
+    usingPasswordB64: Boolean(process.env.DB_PASSWORD_B64),
+  };
+}
+
+export function createPoolOptions() {
+  const url = getDatabaseUrl();
+  if (url) {
+    return url;
   }
-  return `tcp:${host}:${getDbPort()}`;
+  return {
+    ...getDbConnectionConfig(),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  };
 }
