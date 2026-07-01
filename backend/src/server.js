@@ -25,7 +25,13 @@ function getFrontendDist() {
     path.resolve(__dirname, '../../public'),
     path.resolve(__dirname, '../../frontend/dist'),
   ];
-  return candidates.find((dir) => fs.existsSync(path.join(dir, 'index.html'))) || candidates[0];
+  const found = candidates.find((dir) => fs.existsSync(path.join(dir, 'index.html')));
+  if (found) {
+    console.log('Serving frontend from:', found);
+    return found;
+  }
+  console.warn('No frontend build found. Checked:', candidates.join(', '));
+  return path.join(root, 'public');
 }
 
 export function createApp() {

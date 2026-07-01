@@ -1,6 +1,5 @@
 node_modules/
 dist/
-public/
 .env
 backend/.env
 frontend/.env
