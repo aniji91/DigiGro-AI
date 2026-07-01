@@ -6,7 +6,7 @@
   "type": "module",
   "main": "server.js",
   "engines": {
-    "node": "20.x"
+    "node": ">=18"
   },
   "scripts": {
     "install:all": "npm install --prefix backend && npm install --prefix frontend",
