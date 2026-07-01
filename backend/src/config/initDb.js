@@ -3,12 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const dbName = process.env.DB_NAME || 'digigro_ai';
+
 const schema = `
-CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME || 'digigro_ai'}\`
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE \`${process.env.DB_NAME || 'digigro_ai'}\`;
-
 CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(36) PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
@@ -77,6 +74,7 @@ async function init() {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
     user: process.env.DB_USER || 'root',
+    database: dbName,
     multipleStatements: true,
   };
   if (process.env.DB_PASSWORD) {
@@ -86,6 +84,25 @@ async function init() {
   const connection = await mysql.createConnection(connectionConfig);
 
   try {
+    // Local dev: create database if missing (Hostinger/shared hosting already has one)
+    if (!process.env.DB_PASSWORD || process.env.DB_USER === 'root') {
+      try {
+        const bootstrap = await mysql.createConnection({
+          host: connectionConfig.host,
+          port: connectionConfig.port,
+          user: connectionConfig.user,
+          password: connectionConfig.password,
+          multipleStatements: true,
+        });
+        await bootstrap.query(
+          `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+        );
+        await bootstrap.end();
+      } catch {
+        /* database already exists or user cannot create DB */
+      }
+    }
+
     await connection.query(schema);
     const migrations = [
       'ALTER TABLE projects ADD COLUMN folder VARCHAR(255) DEFAULT NULL',
