@@ -12,6 +12,7 @@ import * as authHandlers from './routes/auth.js';
 import * as projectHandlers from './routes/projects.js';
 import * as shareHandlers from './routes/share.js';
 import { runInit } from './config/initDb.js';
+import pool from './config/database.js';
 
 dotenv.config();
 
@@ -48,13 +49,20 @@ export function createApp() {
   }));
   app.use(express.json({ limit: '10mb' }));
 
-  app.get('/api/health', (_req, res) => {
+  app.get('/api/health', async (_req, res) => {
+    let database = 'connected';
+    try {
+      await pool.query('SELECT 1');
+    } catch (err) {
+      database = err.message;
+    }
     res.json({
-      status: 'ok',
+      status: database === 'connected' ? 'ok' : 'degraded',
       name: 'DIGIGRO AI',
       version: '1.0.0',
       aiMode: getAiMode(),
       vercelConfigured: isVercelConfigured(),
+      database,
     });
   });
 
