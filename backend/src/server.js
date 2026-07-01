@@ -43,13 +43,7 @@ export function createApp() {
 
   const siteUrl = process.env.FRONTEND_URL || '';
   app.use(cors({
-    origin(origin, callback) {
-      if (!origin || !siteUrl || origin === siteUrl || origin.includes('hostingersite.com')) {
-        callback(null, true);
-      } else {
-        callback(null, siteUrl);
-      }
-    },
+    origin: siteUrl || true,
     credentials: true,
   }));
   app.use(express.json({ limit: '10mb' }));
@@ -121,28 +115,12 @@ export function createApp() {
 
 export async function startServer() {
   const { app, hasFrontendBuild } = createApp();
-  const port = process.env.PORT || 5000;
+  const port = Number(process.env.PORT) || 3000;
 
-  try {
-    await runInit();
-  } catch (err) {
-    console.error('Database init warning:', err.message);
-  }
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`DIGIGRO AI listening on port ${port}`);
+    console.log('Frontend:', hasFrontendBuild ? 'yes' : 'no');
+  });
 
-  const onListen = () => {
-    console.log(`
-  ╔══════════════════════════════════════╗
-  ║         DIGIGRO AI Backend           ║
-  ║     port ${port}                         ║
-  ║  AI Mode: ${getAiModeLabel()}             ║
-  ║  Frontend: ${hasFrontendBuild ? 'served' : 'not built'}              ║
-  ╚══════════════════════════════════════╝
-  `);
-  };
-
-  if (process.env.PASSENGER_APP_ENV) {
-    app.listen('passenger', onListen);
-  } else {
-    app.listen(port, '0.0.0.0', onListen);
-  }
+  runInit().catch((err) => console.error('DB init:', err.message));
 }
