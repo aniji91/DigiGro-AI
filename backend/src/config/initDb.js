@@ -1,9 +1,10 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { getDbConnectionConfig, getDbName } from './dbConfig.js';
 
 dotenv.config();
 
-const dbName = process.env.DB_NAME || 'digigro_ai';
+const dbName = getDbName();
 
 const schema = `
 CREATE TABLE IF NOT EXISTS users (
@@ -70,17 +71,7 @@ CREATE TABLE IF NOT EXISTS project_views (
 `;
 
 export async function runInit() {
-  const connectionConfig = {
-    host: process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || process.env.MYSQL_PORT || '3306', 10),
-    user: process.env.DB_USER || process.env.MYSQL_USER || 'root',
-    database: dbName,
-    multipleStatements: true,
-  };
-  const dbPassword = process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD;
-  if (dbPassword) {
-    connectionConfig.password = dbPassword;
-  }
+  const connectionConfig = getDbConnectionConfig({ multipleStatements: true });
 
   let connection;
   try {
