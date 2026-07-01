@@ -1,3 +1,1 @@
-import { startServer } from './backend/src/server.js';
-
-await startServer();
+export { default } from './app.js';

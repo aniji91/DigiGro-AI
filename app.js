@@ -1,9 +1,12 @@
 import { startServer } from './backend/src/server.js';
 
-try {
-  console.log('DIGIGRO AI — starting on port', process.env.PORT || 3000);
-  await startServer();
-} catch (err) {
-  console.error('Failed to start:', err);
-  process.exit(1);
-}
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason);
+});
+
+const app = startServer();
+export default app;

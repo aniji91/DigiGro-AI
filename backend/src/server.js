@@ -113,14 +113,28 @@ export function createApp() {
   return { app, hasFrontendBuild };
 }
 
-export async function startServer() {
-  const { app, hasFrontendBuild } = createApp();
-  const port = Number(process.env.PORT) || 3000;
+/** Hostinger/cPanel run Node via Phusion Passenger — must export app, not call listen(). */
+export function isPassenger() {
+  return typeof globalThis.PhusionPassenger !== 'undefined'
+    || Boolean(process.env.PASSENGER_APP_ENV);
+}
 
+export function startServer() {
+  const { app, hasFrontendBuild } = createApp();
+
+  runInit().catch((err) => console.error('DB init:', err.message));
+
+  if (isPassenger()) {
+    console.log('DIGIGRO AI — Passenger mode (app exported, no listen)');
+    console.log('Frontend:', hasFrontendBuild ? 'yes' : 'no');
+    return app;
+  }
+
+  const port = Number(process.env.PORT) || 3000;
   app.listen(port, '0.0.0.0', () => {
     console.log(`DIGIGRO AI listening on port ${port}`);
     console.log('Frontend:', hasFrontendBuild ? 'yes' : 'no');
   });
 
-  runInit().catch((err) => console.error('DB init:', err.message));
+  return app;
 }
