@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import aiRoutes from './routes/ai.js';
 import { authenticate } from './middleware/auth.js';
-import { getAiMode, getAiModeLabel } from './config/ai.js';
+import { getAiMode } from './config/ai.js';
 import { isVercelConfigured } from './services/vercel.js';
 import * as authHandlers from './routes/auth.js';
 import * as projectHandlers from './routes/projects.js';
