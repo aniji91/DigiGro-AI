@@ -2,15 +2,20 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
-const root = process.cwd();
-const hasBuild = ['public/index.html', 'frontend/dist/index.html'].some((rel) =>
-  fs.existsSync(path.join(root, rel))
-);
-
-if (hasBuild) {
-  console.log('Frontend build found');
-  process.exit(0);
+export function frontendExists() {
+  const root = process.cwd();
+  return ['public/index.html', 'frontend/dist/index.html'].some((rel) =>
+    fs.existsSync(path.join(root, rel))
+  );
 }
 
-console.log('Frontend not built — running npm run build...');
-execSync('npm run build', { stdio: 'inherit', cwd: root });
+export function ensureFrontendBuild() {
+  if (frontendExists()) {
+    console.log('Frontend build found');
+    return;
+  }
+
+  console.log('Frontend not built — running npm run build...');
+  execSync('npm run build', { stdio: 'inherit', cwd: process.cwd(), env: process.env });
+  console.log('Frontend build complete');
+}
