@@ -1,6 +1,8 @@
-console.log('DIGIGRO AI — starting app.js');
+import { startServer } from './backend/src/server.js';
+
+console.log('DIGIGRO AI — starting');
 console.log('cwd:', process.cwd());
 console.log('PORT:', process.env.PORT || '5000');
-console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('PASSENGER:', process.env.PASSENGER_APP_ENV || 'no');
 
-await import('./backend/src/index.js');
+await startServer();

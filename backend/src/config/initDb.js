@@ -71,19 +71,20 @@ CREATE TABLE IF NOT EXISTS project_views (
 
 export async function runInit() {
   const connectionConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    host: process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || process.env.MYSQL_PORT || '3306', 10),
+    user: process.env.DB_USER || process.env.MYSQL_USER || 'root',
     database: dbName,
     multipleStatements: true,
   };
-  if (process.env.DB_PASSWORD) {
-    connectionConfig.password = process.env.DB_PASSWORD;
+  const dbPassword = process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD;
+  if (dbPassword) {
+    connectionConfig.password = dbPassword;
   }
 
-  const connection = await mysql.createConnection(connectionConfig);
-
+  let connection;
   try {
+    connection = await mysql.createConnection(connectionConfig);
     // Local dev: create database if missing (Hostinger/shared hosting already has one)
     if (!process.env.DB_PASSWORD || process.env.DB_USER === 'root') {
       try {
@@ -173,7 +174,7 @@ export async function runInit() {
       process.exit(1);
     }
   } finally {
-    await connection.end();
+    if (connection) await connection.end();
   }
 }
 
