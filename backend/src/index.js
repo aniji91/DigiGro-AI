@@ -1,5 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import aiRoutes from './routes/ai.js';
 import { authenticate } from './middleware/auth.js';
@@ -10,6 +13,10 @@ import * as projectHandlers from './routes/projects.js';
 import * as shareHandlers from './routes/share.js';
 
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+const hasFrontendBuild = fs.existsSync(path.join(frontendDist, 'index.html'));
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,17 +68,34 @@ app.post('/api/preview/:id/track', projectHandlers.trackProjectView);
 
 app.use('/api/ai', aiRoutes);
 
+if (hasFrontendBuild) {
+  app.use(express.static(frontendDist));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+} else {
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'DIGIGRO AI API',
+      health: '/api/health',
+      hint: 'Frontend not built. Run: npm run build --prefix frontend',
+    });
+  });
+}
+
 app.use((err, _req, res, _next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`
   ╔══════════════════════════════════════╗
   ║         DIGIGRO AI Backend           ║
   ║     http://localhost:${PORT}            ║
   ║  AI Mode: ${getAiModeLabel()}             ║
+  ║  Frontend: ${hasFrontendBuild ? 'served' : 'not built'}              ║
   ╚══════════════════════════════════════╝
   `);
 });
