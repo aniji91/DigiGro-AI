@@ -167,7 +167,11 @@ async function init() {
     console.log('✅ DIGIGRO AI database initialized successfully');
   } catch (err) {
     console.error('❌ Database initialization failed:', err.message);
-    process.exit(1);
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Continuing without db:init — check DB_* environment variables.');
+    } else {
+      process.exit(1);
+    }
   } finally {
     await connection.end();
   }

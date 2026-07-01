@@ -6,10 +6,11 @@
   "engines": {
     "node": ">=18"
   },
+  "main": "server.js",
   "scripts": {
     "install:all": "npm install --prefix backend && npm install --prefix frontend",
-    "build": "npm install --prefix backend && npm install --prefix frontend --include=dev && npm run build --prefix frontend && npm run db:init --prefix backend",
-    "start": "npm run start --prefix backend",
+    "build": "npm install --prefix backend && npm install --prefix frontend --include=dev && npm run build --prefix frontend",
+    "start": "node backend/src/config/initDb.js && node server.js",
     "db:init": "npm run db:init --prefix backend",
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
