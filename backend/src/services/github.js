@@ -1,4 +1,3 @@
-import { Octokit } from '@octokit/rest';
 import { slugify } from './export.js';
 
 async function getFileSha(octokit, owner, repo, path) {
@@ -12,6 +11,7 @@ async function getFileSha(octokit, owner, repo, path) {
 }
 
 export async function pushProjectToGitHub({ token, repoName, projectName, files, isPrivate = false }) {
+  const { Octokit } = await import('@octokit/rest');
   const octokit = new Octokit({ auth: token });
 
   const { data: user } = await octokit.users.getAuthenticated();
