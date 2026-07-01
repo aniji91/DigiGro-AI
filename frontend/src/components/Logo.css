@@ -1,0 +1,23 @@
+.digigro-logo-link {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.digigro-logo {
+  display: block;
+  height: auto;
+  object-fit: contain;
+}
+
+.digigro-logo--sm {
+  width: 120px;
+}
+
+.digigro-logo--md {
+  width: 148px;
+}
+
+.digigro-logo--lg {
+  width: 200px;
+}

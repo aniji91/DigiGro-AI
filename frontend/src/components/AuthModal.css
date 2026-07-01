@@ -1,0 +1,126 @@
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem 2.5rem 2.5rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  padding: 0.375rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+}
+
+.auth-modal-close:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.auth-modal .auth-logo-img {
+  margin-bottom: 1.5rem;
+  padding: 0.875rem 1.25rem;
+  background: var(--header-bg);
+  border-radius: var(--radius);
+  display: inline-flex;
+}
+
+.auth-modal h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.auth-modal .auth-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.375rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-modal .auth-error {
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.auth-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.auth-modal input {
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.auth-modal input:focus {
+  border-color: var(--accent);
+}
+
+.auth-modal .auth-submit {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+}
+
+.auth-modal .auth-switch {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.auth-modal .auth-switch button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 500;
+  font-size: inherit;
+  padding: 0;
+}
+
+.auth-modal .auth-switch button:hover {
+  text-decoration: underline;
+}

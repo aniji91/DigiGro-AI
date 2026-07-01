@@ -1,0 +1,116 @@
+.chat-attach-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+}
+
+.chat-attach-menu {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  z-index: 901;
+  max-height: min(420px, 70vh);
+  overflow-y: auto;
+}
+
+.chat-attach-menu--portal {
+  position: fixed;
+}
+
+.chat-attach-section {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.chat-attach-section:last-of-type {
+  border-bottom: none;
+}
+
+.chat-attach-section-title {
+  padding: 0.375rem 1rem 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chat-attach-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.chat-attach-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.chat-attach-item span:first-of-type {
+  flex: 1;
+}
+
+.chat-attach-shortcut {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+}
+
+.chat-ref-menu,
+.chat-skill-menu {
+  padding: 0.375rem 0;
+}
+
+.chat-ref-empty {
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.chat-ref-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.chat-ref-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.chat-skill-menu {
+  padding: 0.375rem;
+}
+
+.chat-skill-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.chat-skill-item:hover {
+  background: var(--bg-tertiary);
+}
