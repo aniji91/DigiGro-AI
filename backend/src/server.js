@@ -18,11 +18,14 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function getFrontendDist() {
+  const root = process.cwd();
   const candidates = [
+    path.join(root, 'public'),
+    path.join(root, 'frontend', 'dist'),
     path.resolve(__dirname, '../../public'),
     path.resolve(__dirname, '../../frontend/dist'),
   ];
-  return candidates.find((dir) => fs.existsSync(path.join(dir, 'index.html'))) || candidates[1];
+  return candidates.find((dir) => fs.existsSync(path.join(dir, 'index.html'))) || candidates[0];
 }
 
 export function createApp() {
