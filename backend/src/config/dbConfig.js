@@ -1,5 +1,7 @@
 /** Shared MySQL connection settings for local dev and Hostinger production. */
 
+const DEFAULT_SOCKET = '/var/lib/mysql/mysql.sock';
+
 export function getDbHost() {
   return process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost';
 }
@@ -27,7 +29,14 @@ export function getDatabaseUrl() {
   return process.env.DATABASE_URL || process.env.MYSQL_URL || null;
 }
 
-/** Hostinger docs: host localhost + port 3306. Optional DB_SOCKET for socket-only setups. */
+/** Hostinger MySQL users are user@localhost — must use Unix socket, not TCP ::1. */
+function shouldUseSocket() {
+  if (process.env.DB_SOCKET) return process.env.DB_SOCKET;
+  if (process.platform === 'win32') return false;
+  const host = getDbHost();
+  return host === 'localhost' || host === '127.0.0.1';
+}
+
 export function getDbConnectionConfig(overrides = {}) {
   const config = {
     user: getDbUser(),
@@ -37,21 +46,25 @@ export function getDbConnectionConfig(overrides = {}) {
   const password = getDbPassword();
   if (password) config.password = password;
 
-  const socketPath = process.env.DB_SOCKET;
-  if (socketPath) {
-    config.socketPath = socketPath;
+  const socket = shouldUseSocket();
+  if (socket) {
+    config.socketPath = typeof socket === 'string' ? socket : DEFAULT_SOCKET;
     return config;
   }
 
-  config.host = getDbHost();
+  config.host = getDbHost() === 'localhost' ? '127.0.0.1' : getDbHost();
   config.port = getDbPort();
   return config;
 }
 
 export function getDbConnectionMode() {
+  const socket = shouldUseSocket();
+  if (socket) {
+    return `socket:${typeof socket === 'string' ? socket : DEFAULT_SOCKET}`;
+  }
   if (getDatabaseUrl()) return 'url:DATABASE_URL';
-  if (process.env.DB_SOCKET) return `socket:${process.env.DB_SOCKET}`;
-  return `tcp:${getDbHost()}:${getDbPort()}`;
+  const host = getDbHost() === 'localhost' ? '127.0.0.1' : getDbHost();
+  return `tcp:${host}:${getDbPort()}`;
 }
 
 export function getDbEnvDiagnostics() {
@@ -69,14 +82,31 @@ export function getDbEnvDiagnostics() {
 }
 
 export function createPoolOptions() {
-  const url = getDatabaseUrl();
-  if (url) {
-    return url;
-  }
-  return {
-    ...getDbConnectionConfig(),
+  const user = getDbUser();
+  const database = getDbName();
+  const password = getDbPassword();
+  const poolExtras = {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
   };
+
+  // Hostinger: always prefer socket when credentials are in separate env vars
+  const socket = shouldUseSocket();
+  if (socket && user && database && password) {
+    return {
+      socketPath: typeof socket === 'string' ? socket : DEFAULT_SOCKET,
+      user,
+      password,
+      database,
+      ...poolExtras,
+    };
+  }
+
+  const url = getDatabaseUrl();
+  if (url) {
+    return url.replace(/@localhost/i, '@127.0.0.1');
+  }
+
+  return { ...getDbConnectionConfig(), ...poolExtras };
 }
