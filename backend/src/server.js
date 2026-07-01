@@ -13,6 +13,7 @@ import * as projectHandlers from './routes/projects.js';
 import * as shareHandlers from './routes/share.js';
 import { runInit } from './config/initDb.js';
 import pool from './config/database.js';
+import { getDbConnectionMode } from './config/dbConfig.js';
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ export function createApp() {
       aiMode: getAiMode(),
       vercelConfigured: isVercelConfigured(),
       database,
+      dbMode: getDbConnectionMode(),
     });
   });
 

@@ -1,7 +1,7 @@
-/** Shared MySQL connection settings (Hostinger: use 127.0.0.1 instead of localhost to avoid ::1). */
+/** Shared MySQL connection settings for local dev and Hostinger production. */
+
 export function getDbHost() {
-  const host = process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost';
-  return host === 'localhost' ? '127.0.0.1' : host;
+  return process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost';
 }
 
 export function getDbPort() {
@@ -20,15 +20,36 @@ export function getDbPassword() {
   return process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD || undefined;
 }
 
+function useSocketConnection(host) {
+  if (process.env.DB_SOCKET) return true;
+  // Hostinger grants DB users as user@localhost (socket), not user@127.0.0.1 (TCP)
+  return host === 'localhost' && process.platform !== 'win32';
+}
+
 export function getDbConnectionConfig(overrides = {}) {
+  const host = getDbHost();
   const config = {
-    host: getDbHost(),
-    port: getDbPort(),
     user: getDbUser(),
     database: getDbName(),
     ...overrides,
   };
   const password = getDbPassword();
   if (password) config.password = password;
+
+  if (useSocketConnection(host)) {
+    config.socketPath = process.env.DB_SOCKET || '/var/lib/mysql/mysql.sock';
+    return config;
+  }
+
+  config.host = host;
+  config.port = getDbPort();
   return config;
+}
+
+export function getDbConnectionMode() {
+  const host = getDbHost();
+  if (useSocketConnection(host)) {
+    return `socket:${process.env.DB_SOCKET || '/var/lib/mysql/mysql.sock'}`;
+  }
+  return `tcp:${host}:${getDbPort()}`;
 }
