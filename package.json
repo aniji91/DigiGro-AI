@@ -4,14 +4,14 @@
   "private": true,
   "description": "DIGIGRO AI — Lovable.dev-like AI app builder platform",
   "type": "module",
-  "main": "server.js",
+  "main": "app.js",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "install:all": "npm install --prefix backend && npm install --prefix frontend",
-    "build": "npm install --prefix frontend --include=dev && npm run build --prefix frontend",
-    "start": "node backend/src/config/initDb.js && node server.js",
+    "build": "npm install --prefix frontend --include=dev && npm run build --prefix frontend && node scripts/copy-build.js",
+    "start": "node app.js",
     "db:init": "node backend/src/config/initDb.js",
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend"

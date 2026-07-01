@@ -15,7 +15,12 @@ import * as shareHandlers from './routes/share.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+const distCandidates = [
+  path.resolve(__dirname, '../../public'),
+  path.resolve(__dirname, '../../frontend/dist'),
+];
+const frontendDist = distCandidates.find((dir) => fs.existsSync(path.join(dir, 'index.html')))
+  || distCandidates[1];
 const hasFrontendBuild = fs.existsSync(path.join(frontendDist, 'index.html'));
 
 const app = express();
